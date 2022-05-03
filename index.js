@@ -50,8 +50,35 @@ app.post('/sign-up', async (req, res) => {
         res.status(201).send("Account created succesfully.");
     } catch (e) {
         console.log(e);
-        res.status(421).send();
+        res.status(500).send();
     }
 })
+
+app.post('/sign-in', async (req, res) => {
+    const {email, password} = req.body;
+
+    const signinSchema = joi.object({
+        email: joi.string().email({ tlds: { allow: false } }).required(),
+        password: joi.string().required(),
+    })
+
+    const validation = signinSchema.validate(req.body);
+    if (validation.error) {
+        console.log(validation.error.details);
+    }
+    
+    try {
+        const user = await db.collection('users').findOne({email: email});
+
+        if (user && bcrypt.compareSync(password, user.password)) {
+            res.status(200).send();
+        } else {
+            res.status(401).send("Email or password is incorrect.");
+        }
+
+    } catch (e) {
+        res.status(500).send();
+    }
+});
 
 app.listen(process.env.PORTA);
