@@ -44,7 +44,9 @@ app.post('/sign-up', async (req, res) => {
         await db.collection('users').insertOne({
             name: name,
             email: email,
-            password: passwordHash
+            password: passwordHash,
+            cash_in: [],
+            cash_out: []
         });
         
         res.status(201).send("Account created succesfully.");
@@ -80,5 +82,14 @@ app.post('/sign-in', async (req, res) => {
         res.status(500).send();
     }
 });
+
+app.post('/cash-in', async (req, res) => {
+    
+});
+
+app.post('/cash-out', async (req, res) => {
+
+});
+
 
 app.listen(process.env.PORTA);
