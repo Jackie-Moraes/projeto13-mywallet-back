@@ -2,8 +2,7 @@ import bcrypt from 'bcrypt';
 import {v4} from "uuid";
 import joi from "joi";
 import dayjs from 'dayjs';
-import db from "./../db.js"
-import dotenv from "dotenv";
+import db from "./../db.js";
 
 export async function signUp(req, res) {
     const {name, email, password, password_confirm} = req.body;
@@ -30,7 +29,7 @@ export async function signUp(req, res) {
             return res.status(409).send("Email already in use.");
         };
 
-        const passwordHash = bcrypt.hashSync(password, process.env.HASH);
+        const passwordHash = bcrypt.hashSync(password, 10);
         await db.collection('users').insertOne({
             name,
             email,
