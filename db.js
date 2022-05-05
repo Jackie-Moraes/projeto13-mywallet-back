@@ -10,5 +10,7 @@ try {
     db = mongoClient.db(process.env.BANCO);
     console.log("Database connection was successful.");
 } catch (e) {
-    console.log("Database connection was unsuccessful.")
+    console.log("Database connection was unsuccessful.", e);
 }
+
+export default db;
