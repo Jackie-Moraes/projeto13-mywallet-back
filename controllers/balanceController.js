@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 export async function getBalance(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace('Bearer ', '').trim();
-    const session = await db.collections("sessions").findOne({ token });
+    const session = await db.collection("sessions").findOne({ token });
 
     if (!session) return res.status(401).send();
 
