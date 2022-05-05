@@ -8,7 +8,6 @@ import dotenv from "dotenv";
 import { signIn, signUp } from "./controllers/authController";
 import { cashIn, cashOut } from "./controllers/balanceController";
 
-
 dotenv.config();
 
 const app = express();
@@ -20,12 +19,8 @@ await mongoClient.connect();
 const db = mongoClient.db(process.env.BANCO);
 
 app.post('/sign-up', signUp);
-
 app.post('/sign-in', signIn);
-
 app.post('/cash-in', cashIn);
-
 app.post('/cash-out', cashOut);
-
 
 app.listen(process.env.PORTA);
