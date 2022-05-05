@@ -10,10 +10,8 @@ export async function getBalance(req, res) {
     if (!session) return res.status(401).send();
 
     try {
-        const user = await db.collections('users').findOne({ 
-            _id: session.userId 
-        });
-        
+        const user = await db.collections('users').findOne({_id: session.userId});
+
         if (user) {
             delete user.email;
             delete user.password;
@@ -79,9 +77,7 @@ export async function cashOut(req, res) {
     };
 
     try {
-        const user = await db.collections('users').findOne({ 
-            _id: session.userId 
-        });
+        const user = await db.collections('users').findOne({_id: session.userId});
         
         if (user) {
             await db.collection('users').updateOne({user}, {$push: {cash_out: req.body}});
