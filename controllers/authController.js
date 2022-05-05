@@ -3,6 +3,7 @@ import {v4} from "uuid";
 import joi from "joi";
 import dayjs from 'dayjs';
 import db from "./../db.js"
+import dotenv from "dotenv";
 
 export async function signUp(req, res) {
     const {name, email, password, password_confirm} = req.body;
@@ -20,19 +21,19 @@ export async function signUp(req, res) {
 
     const validation = signupSchema.validate(req.body);
     if (validation.error) {
-        console.log(validation.error.details);
+        console.log("Erro de validação! ", validation.error.details);
     };
 
     try {
-        const exists = await db.collection('users').findOne(email);
+        const exists = await db.collection('users').findOne({email});
         if (exists) {
             return res.status(409).send("Email already in use.");
         };
 
         const passwordHash = bcrypt.hashSync(password, process.env.HASH);
         await db.collection('users').insertOne({
-            name: name,
-            email: email,
+            name,
+            email,
             password: passwordHash,
             cash_in: [],
             cash_out: []
@@ -40,7 +41,7 @@ export async function signUp(req, res) {
         
         res.status(201).send("Account created succesfully.");
     } catch (e) {
-        console.log(e);
+        console.log("Erro de conexão! ",e);
         res.status(500).send();
     }
 };

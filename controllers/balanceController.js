@@ -1,6 +1,7 @@
 import joi from "joi";
 import dayjs from "dayjs";
 import db from "./../db.js"
+import dotenv from "dotenv";
 
 export async function getBalance(req, res) {
     const { authorization } = req.headers;
