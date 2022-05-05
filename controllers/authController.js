@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import {v4} from "uuid";
 import joi from "joi";
+import dayjs from 'dayjs';
+import db from "./../db"
 
 export async function signUp(req, res) {
     const {name, email, password, password_confirm} = req.body;
