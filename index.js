@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
-import { signIn, signUp } from "./controllers/authController";
-import { cashIn, cashOut } from "./controllers/balanceController";
+import { signIn, signUp } from "./controllers/authController.js";
+import { cashIn, cashOut } from "./controllers/balanceController.js";
 
 dotenv.config();
 
