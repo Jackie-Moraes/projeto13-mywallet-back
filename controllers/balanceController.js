@@ -8,19 +8,25 @@ export async function getBalance(req, res) {
     const token = authorization?.replace('Bearer ', '').trim();
     const session = await db.collection("sessions").findOne({ token });
 
-    if (!session) return res.status(401).send();
+    if (!session) {
+        console.log("Sessão não encontrada ", e)
+        return res.status(401).send();
+    }
 
     try {
-        const user = await db.collections('users').findOne({_id: session.userId});
+        const user = await db.collection('users').findOne({_id: session.userId});
 
         if (user) {
+            delete user._id;
             delete user.email;
             delete user.password;
             res.status(200).send(user)
         } else {
+            console.log("Usuário não encontrado ", e)
             res.status(401).send();
         }
     } catch (e) {
+        console.log("Erro ao conectar ", e);
         res.status(401).send();
     }
 }
@@ -28,7 +34,7 @@ export async function getBalance(req, res) {
 export async function cashIn(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace('Bearer ', '').trim();
-    const session = await db.collections("sessions").findOne({ token });
+    const session = await db.collection("sessions").findOne({ token });
 
     if (!session) return res.status(401).send();
 
@@ -44,12 +50,13 @@ export async function cashIn(req, res) {
     };
 
     try {
-        const user = await db.collections('users').findOne({ 
+        const user = await db.collection('users').findOne({ 
             _id: session.userId 
         });
         
         if (user) {
-            await db.collection('users').updateOne({user}, {$push: {cash_in: req.body}});
+            await db.collection('users').updateOne({_id: session.userId}, {$push: {cash_in: req.body}});
+            console.log("New Cash-In created successfully.");
             res.status(201).send();
         } else {
             res.status(401).send();
@@ -62,7 +69,7 @@ export async function cashIn(req, res) {
 export async function cashOut(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace('Bearer ', '').trim();
-    const session = await db.collections("sessions").findOne({ token });
+    const session = await db.collection("sessions").findOne({ token });
 
     if (!session) return res.status(401).send();
 
@@ -78,10 +85,11 @@ export async function cashOut(req, res) {
     };
 
     try {
-        const user = await db.collections('users').findOne({_id: session.userId});
+        const user = await db.collection('users').findOne({_id: session.userId});
         
         if (user) {
-            await db.collection('users').updateOne({user}, {$push: {cash_out: req.body}});
+            await db.collection('users').updateOne({_id: session.userId}, {$push: {cash_out: req.body}});
+            console.log("New Cash-Out created successfully.");
             res.status(201).send();
         } else {
             res.status(401).send();
