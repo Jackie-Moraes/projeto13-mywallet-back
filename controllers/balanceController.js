@@ -17,10 +17,7 @@ export async function getBalance(req, res) {
         const user = await db.collection('users').findOne({_id: session.userId});
 
         if (user) {
-            delete user._id;
-            delete user.email;
-            delete user.password;
-            res.status(200).send(user)
+            res.status(200).send(user.balance)
         } else {
             console.log("Usuário não encontrado ", e)
             res.status(401).send();
@@ -31,7 +28,7 @@ export async function getBalance(req, res) {
     }
 }
 
-export async function cashIn(req, res) {
+export async function postBalance(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace('Bearer ', '').trim();
     const session = await db.collection("sessions").findOne({ token });
@@ -40,7 +37,8 @@ export async function cashIn(req, res) {
 
     const cashinSchema = joi.object({
         value: joi.number().required(),
-        description: joi.string().required()
+        description: joi.string().required(),
+        operation: joi.string().valid('cashIn', "cashOut").required()
     });
 
     const validation = cashinSchema.validate(req.body);
@@ -55,41 +53,8 @@ export async function cashIn(req, res) {
         });
         
         if (user) {
-            await db.collection('users').updateOne({_id: session.userId}, {$push: {cash_in: req.body}});
-            console.log("New Cash-In created successfully.");
-            res.status(201).send();
-        } else {
-            res.status(401).send();
-        }
-    } catch (e) {
-        res.status(401).send();
-    }
-}
-
-export async function cashOut(req, res) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace('Bearer ', '').trim();
-    const session = await db.collection("sessions").findOne({ token });
-
-    if (!session) return res.status(401).send();
-
-    const cashoutSchema = joi.object({
-        value: joi.number().required(),
-        description: joi.string().required()
-    });
-
-    const validation = cashoutSchema.validate(req.body);
-
-    if (validation.error) {
-        console.log(validation.error.details);
-    };
-
-    try {
-        const user = await db.collection('users').findOne({_id: session.userId});
-        
-        if (user) {
-            await db.collection('users').updateOne({_id: session.userId}, {$push: {cash_out: req.body}});
-            console.log("New Cash-Out created successfully.");
+            await db.collection('users').updateOne({_id: session.userId}, {$push: {balance: req.body}});
+            console.log("New entry created successfully.");
             res.status(201).send();
         } else {
             res.status(401).send();

@@ -5,9 +5,9 @@ import dayjs from 'dayjs';
 import db from "./../db.js";    
 
 export async function signUp(req, res) {
-    const {name, email, password, password_confirm} = req.body;
+    const {name, email, password, passwordConfirmation} = req.body;
 
-    if (password !== password_confirm) {
+    if (password !== passwordConfirmation) {
         return res.status(422).send("Passwords must match.")
     }
 
@@ -15,12 +15,12 @@ export async function signUp(req, res) {
         name: joi.string().pattern(/^[a-zA-ZãÃÇ-Üá-ú ]*$/i).required(),
         email: joi.string().email({ tlds: { allow: false } }).required(),
         password: joi.string().required(),
-        password_confirm: joi.string().required()
+        passwordConfirmation: joi.string().required()
     });
 
     const validation = signupSchema.validate(req.body);
     if (validation.error) {
-        console.log("Erro de validação! ", validation.error.details);
+        console.log("Validation error! ", validation.error.details);
     };
 
     try {
@@ -34,13 +34,12 @@ export async function signUp(req, res) {
             name,
             email,
             password: passwordHash,
-            cash_in: [],
-            cash_out: []
+            balance: []
         });
         
         res.status(201).send("Account created succesfully.");
     } catch (e) {
-        console.log("Erro de conexão! ",e);
+        console.log("Connection error! ",e);
         res.status(500).send();
     }
 };
@@ -69,7 +68,7 @@ export async function signIn(req, res) {
                 token
             });
 
-            res.status(200).send(token);
+            res.status(200).send({name: user.name, balance: user.balance, token});
         } else {
             res.status(401).send("Email or password is incorrect.");
         }
