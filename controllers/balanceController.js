@@ -9,7 +9,7 @@ export async function getBalance(req, res) {
     const session = await db.collection("sessions").findOne({ token });
 
     if (!session) {
-        console.log("Sessão não encontrada ", e)
+        console.log("Session not found.")
         return res.status(401).send();
     }
 
@@ -19,7 +19,7 @@ export async function getBalance(req, res) {
         if (user) {
             res.status(200).send(user.balance)
         } else {
-            console.log("Usuário não encontrado ", e)
+            console.log("User not found.")
             res.status(401).send();
         }
     } catch (e) {
@@ -48,18 +48,26 @@ export async function postBalance(req, res) {
     };
 
     try {
+        const {value, description, operation} = req.body
         const user = await db.collection('users').findOne({ 
             _id: session.userId 
         });
-        
+
         if (user) {
-            await db.collection('users').updateOne({_id: session.userId}, {$push: {balance: req.body}});
+            const entry = {
+                date: dayjs().locale('pt-br').format('DD/MM'),
+                value,
+                description,
+                operation,
+            }
+            await db.collection('users').updateOne({_id: session.userId}, {$push: {balance: entry}});
             console.log("New entry created successfully.");
             res.status(201).send();
         } else {
             res.status(401).send();
         }
     } catch (e) {
+        console.log(e);
         res.status(401).send();
     }
 }
